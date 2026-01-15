@@ -1,0 +1,160 @@
+<!-- Author: Susindran -->
+<!-- OS support: Web -->
+<!-- Description: Cinematic HUD-inspired AI Research Portfolio. -->
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Susindran | AI Systems Architect</title>
+    <meta name="description" content="Official portfolio of Susindran, showcasing research in agentic AI, neural architectures, and software engineering.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@100;200;300;400;500;700&family=Inter:wght@100;200;300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --silver: #e0e0e0;
+            --silver-dim: #a0a0a0;
+            --gunmetal: #050505;
+            --gunmetal-light: #0a0a0a;
+            --scroll: 0;
+        }
+        body {
+            background-color: var(--gunmetal);
+            color: var(--silver);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            cursor: none;
+            -webkit-font-smoothing: antialiased;
+        }
+        .font-mono-tech { font-family: 'JetBrains Mono', monospace; }
+        .font-heading { font-family: 'Space Grotesk', sans-serif; }
+        
+        .metallic-border {
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.4) 100%);
+            backdrop-filter: blur(12px);
+            position: relative;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* HUD Corners */
+        .hud-corner {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-color: rgba(255,255,255,0.3);
+            border-style: solid;
+            pointer-events: none;
+        }
+        .hud-corner-tl { top: 0; left: 0; border-width: 1px 0 0 1px; }
+        .hud-corner-tr { top: 0; right: 0; border-width: 1px 1px 0 0; }
+        .hud-corner-bl { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+        .hud-corner-br { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+        
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        .reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .grain {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+            opacity: 0.05; pointer-events: none; z-index: 50; mix-blend-mode: overlay;
+        }
+
+        .grid-overlay {
+            position: fixed; inset: 0; pointer-events: none; z-index: -1;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 100px 100px;
+            mask-image: radial-gradient(circle at center, black 40%, transparent 90%);
+        }
+        
+        /* --- Unique Technical Cursor Styles --- */
+        .custom-cursor {
+            width: 30px;
+            height: 30px;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            /* Container centers the graphic */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cursor-graphic {
+            width: 100%;
+            height: 100%;
+            border: 1px solid rgba(255,255,255,0.6);
+            transform: rotate(45deg);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 0 10px rgba(255,255,255,0.1);
+        }
+
+        /* Active State (Hovering links/buttons) */
+        .custom-cursor.active .cursor-graphic {
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-color: white;
+            transform: rotate(225deg); /* Spin effect */
+            box-shadow: 0 0 20px rgba(255,255,255,0.8);
+        }
+
+        .custom-cursor-dot {
+            width: 4px;
+            height: 4px;
+            background: white;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            border-radius: 50%;
+            box-shadow: 0 0 4px white;
+        }
+        
+        .silver-gradient {
+            background: linear-gradient(135deg, #fff 0%, #aaa 50%, #fff 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: text-shine 8s linear infinite;
+        }
+        @keyframes text-shine { to { background-position: 200% center; } }
+        
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+    <script type="importmap">
+    {
+      "imports": {
+        "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+        "react/": "https://esm.sh/react@^19.2.3/",
+        "react": "https://esm.sh/react@^19.2.3"
+      }
+    }
+    </script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+    <div id="root"></div>
+    <div class="grain"></div>
+    <div class="grid-overlay"></div>
+    <div class="fixed inset-0 pointer-events-none z-40 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.5)_100%)]"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
+<!-- --- End of index.html --- -->
